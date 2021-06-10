@@ -1,6 +1,21 @@
 import React, { useEffect, useState } from "react";
 
-import Icon from "@material-ui/core/Icon";
+import {
+  Icon,
+  Tooltip,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Hidden,
+  Collapse,
+} from "@material-ui/core";
+import withStyles from "@material-ui/core/styles/withStyles";
+import PerfectScrollbar from "perfect-scrollbar";
+import { NavLink } from "react-router-dom";
+import cx from "classnames";
+
 import AccountTreeTwoToneIcon from "@material-ui/icons/AccountTreeTwoTone";
 import HighlightOffTwoToneIcon from "@material-ui/icons/HighlightOffTwoTone";
 import PermIdentityTwoToneIcon from "@material-ui/icons/PermIdentityTwoTone";
@@ -8,6 +23,10 @@ import PersonOutlineTwoToneIcon from "@material-ui/icons/PersonOutlineTwoTone";
 //import AccountBalance from "@material-ui/icons/House";
 import EmojiTransportationTwoToneIcon from "@material-ui/icons/EmojiTransportationTwoTone";
 import BallotTwoToneIcon from "@material-ui/icons/BallotTwoTone";
+import avatar from "../../assets/img/default-avatar.png";
+
+// Styles
+import sidebarStyle from "./SidebarStyle.jsx";
 
 // We've created this component so we can have a ref to the wrapper of the links that appears in our sidebar.
 // This was necessary so that we could initialize PerfectScrollbar on the links.
@@ -44,6 +63,7 @@ function SidebarLayout(props) {
     : "S";
   const [miniActive, setMiniActive] = useState(false);
   const [collapse, setCollapse] = useState(false);
+  const [openAvatar, setOpenAvatar] = useState(false);
 
   const itemText =
     classes.itemText +
@@ -88,6 +108,8 @@ function SidebarLayout(props) {
       <AccountTreeTwoToneIcon />
     );
 
+  //USER PROFILE
+
   if (props.isLoggedIn) {
     userContainer = (
       <div className={userWrapperClass}>
@@ -110,7 +132,7 @@ function SidebarLayout(props) {
                       " " +
                       classes.userCaret +
                       " " +
-                      (this.state.openAvatar ? classes.caretActive : "")
+                      (openAvatar ? classes.caretActive : "")
                     }
                   />
                 }
@@ -119,14 +141,14 @@ function SidebarLayout(props) {
               />
             </NavLink>
 
-            <Collapse in={this.state.openAvatar} unmountOnExit>
+            <Collapse in={openAvatar} unmountOnExit>
               <List className={classes.list + " " + classes.collapseList}>
                 <ListItem
                   className={classes.collapseItem}
                   onClick={this.onMyProfile}
                 >
                   <NavLink
-                    to={getFullUrl("myprofile")}
+                    to={props.getFullUrl("myprofile")}
                     className={classes.itemLink}
                   >
                     <ListItemIcon
@@ -150,7 +172,7 @@ function SidebarLayout(props) {
                   onClick={this.onCuentas}
                 >
                   <NavLink
-                    to={getFullUrl("cuentas")}
+                    to={props.getFullUrl("cuentas")}
                     className={classes.itemLink}
                   >
                     <ListItemIcon
@@ -169,9 +191,7 @@ function SidebarLayout(props) {
                 <ListItem
                   className={classes.collapseItem}
                   onClick={() => {
-                    standalone === "N"
-                      ? window.close()
-                      : this.setState({ openConfirm: true });
+                    standalone === "N" ? window.close() : props.showLogout;
                   }}
                 >
                   <NavLink to="#" className={classes.itemLink}>
@@ -201,7 +221,7 @@ function SidebarLayout(props) {
       <div className={userWrapperClass}>
         <NavLink
           to="#"
-          onClick={this.onLoginClick.bind(this)}
+          onClick={props.onLoginClick}
           className={classes.itemLink}
         >
           <ListItemIcon className={classes.itemIcon} style={{ top: 0 }}>
@@ -219,15 +239,223 @@ function SidebarLayout(props) {
     );
   }
 
+  //LINKS
+
+  const checkPermissions = (prop, user) => true;
+
+  const hasChildrenToShow = (children, user) => {
+    let childrenToShow = false;
+    children.map((prop) => {
+      return (childrenToShow |= checkPermissions(prop, user));
+    });
+    return childrenToShow;
+  };
+
+  // verifies if routeName is the one active (in browser input)
+  const activeRoute = (routeName) => {
+    return props.location.pathname.indexOf(routeName) > -1 ? true : false;
+  };
+
+  //que rayos hace esto this.state[prop.state]
+
+  var links = (
+    <List className={classes.list}>
+      {routes.map((prop, key) => {
+        const disabled = prop.disabled || false;
+
+        if (prop.redirect) return null;
+        if (prop.notShowOnMenu) return null;
+        if (prop.private && !props.isLoggedIn) return null;
+        if (prop.collapse) {
+          if (!hasChildrenToShow(prop.views, user)) return null;
+          const navLinkClasses =
+            classes.itemLink +
+            " " +
+            cx({
+              [" " + classes.collapseActive]: activeRoute(prop.path),
+            });
+          const itemText =
+            classes.itemText +
+            " " +
+            cx({
+              [classes.itemTextMini]: props.miniActive && miniActive,
+            });
+          const collapseItemText =
+            classes.collapseItemText +
+            " " +
+            cx({
+              [classes.collapseItemTextMini]: props.miniActive && miniActive,
+            });
+          const itemIcon = classes.itemIcon;
+          const caret = classes.caret;
+          return (
+            <ListItem key={key} className={classes.item} disabled={disabled}>
+              <NavLink
+                to={"#"}
+                className={navLinkClasses}
+                onClick={() => setCollapse(!collapse)}
+              >
+                <ListItemIcon className={itemIcon}>
+                  {typeof prop.icon === "string" ? (
+                    <Icon>{prop.icon}</Icon>
+                  ) : (
+                    <prop.icon color="primary" />
+                  )}
+                </ListItemIcon>
+                <Tooltip title={prop.tooltip || ""} placement="right-start">
+                  <ListItemText
+                    primary={prop.name}
+                    secondary={
+                      <b
+                        className={
+                          caret + " " + (prop.state ? classes.caretActive : "")
+                        }
+                      />
+                    }
+                    disableTypography={true}
+                    className={itemText}
+                  />
+                </Tooltip>
+              </NavLink>
+
+              <Collapse in={prop.state} unmountOnExit>
+                <List className={classes.list + " " + classes.collapseList}>
+                  {prop.views.map((prop, key) => {
+                    const disabled = prop.disabled || false;
+                    if (!checkPermissions(prop, user)) return null;
+                    const navLinkClasses =
+                      classes.collapseItemLink +
+                      " " +
+                      cx({
+                        [" " + classes.optionColor]: activeRoute(prop.path),
+                      });
+                    return (
+                      <ListItem
+                        key={key}
+                        className={classes.collapseItem}
+                        disabled={disabled}
+                      >
+                        <NavLink
+                          to={disabled ? "#" : prop.path}
+                          className={navLinkClasses}
+                        >
+                          <ListItemIcon className={itemIcon} style={{ top: 0 }}>
+                            {typeof prop.icon === "string" ? (
+                              <Icon>{prop.icon}</Icon>
+                            ) : (
+                              <prop.icon color="primary" />
+                            )}
+                          </ListItemIcon>
+                          <Tooltip
+                            title={prop.tooltip || ""}
+                            placement="right-start"
+                          >
+                            <ListItemText
+                              primary={prop.name}
+                              disableTypography={true}
+                              className={collapseItemText}
+                            />
+                          </Tooltip>
+                        </NavLink>
+                      </ListItem>
+                    );
+                  })}
+                </List>
+              </Collapse>
+            </ListItem>
+          );
+        }
+        if (!checkPermissions(prop, user)) return null;
+        const navLinkClasses =
+          classes.itemLink +
+          " " +
+          cx({
+            [" " + classes.optionColor]: activeRoute(prop.path),
+          });
+        const itemText =
+          classes.itemText +
+          " " +
+          cx({
+            [classes.itemTextMini]: props.miniActive && state.miniActive,
+          });
+        const itemIcon = classes.itemIcon;
+        return (
+          <ListItem key={key} className={classes.item} disabled={disabled}>
+            <NavLink to={disabled ? "#" : prop.path} className={navLinkClasses}>
+              <ListItemIcon className={itemIcon}>
+                {typeof prop.icon === "string" ? (
+                  <Icon color="primary">{prop.icon}</Icon>
+                ) : (
+                  <prop.icon color="primary" />
+                )}
+              </ListItemIcon>
+              <ListItemText
+                primary={prop.name}
+                disableTypography={true}
+                className={itemText}
+              />
+            </NavLink>
+          </ListItem>
+        );
+      })}
+    </List>
+  );
+
+  const logoNormal =
+    classes.logoNormal +
+    " " +
+    cx({
+      [classes.logoNormalSidebarMini]: props.miniActive && miniActive,
+    });
+  const logoMini =
+    classes.logoMini +
+    " " +
+    cx({
+      [classes.logoMiniSidebarMini]: props.miniActive && miniActive,
+    });
+  const logoImg =
+    classes.img +
+    " " +
+    cx({
+      [classes.imgSidebarMini]: props.miniActive && miniActive,
+    });
+  const logoClasses = classes.logo + " " + classes.drawerBackgroundAfter;
+  var brand = (
+    <div className={logoClasses}>
+      <a href={props.getFullUrl("")} className={logoMini}>
+        <img src={logo} alt="logo" className={logoImg} />
+      </a>
+      {logoText && (
+        <a href={props.getFullUrl("")} className={logoNormal}>
+          {logoText}
+        </a>
+      )}
+    </div>
+  );
+  const drawerPaper =
+    classes.drawerPaper +
+    " " +
+    cx({
+      [classes.drawerPaperMini]: props.miniActive && miniActive,
+    });
+  const sidebarWrapper =
+    classes.sidebarWrapper +
+    " " +
+    cx({
+      [classes.drawerPaperMini]: props.miniActive && miniActive,
+      [classes.sidebarWrapperWithPerfectScrollbar]:
+        navigator.platform.indexOf("Win") > -1,
+    });
+
   return (
     <div ref="mainPanel">
       <Hidden mdUp implementation="css">
         <Drawer
           variant="temporary"
           anchor={"right"}
-          open={this.props.open}
+          open={props.open}
           classes={{ paper: drawerPaper + " " + classes.drawerBackground }}
-          onClose={this.props.handleDrawerToggle}
+          onClose={props.handleDrawerToggle}
           ModalProps={{
             keepMounted: true, // Better open performance on mobile.
           }}
@@ -261,4 +489,4 @@ function SidebarLayout(props) {
   );
 }
 
-export default SidebarLayout;
+export default withStyles(sidebarStyle)(SidebarLayout);
