@@ -1,0 +1,121 @@
+const FormsStyle = (theme) => ({
+  color: "#3C4858",
+  textDecoration: "none",
+  fontWeight: "300",
+  fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+  "& small": {
+    color: "#777",
+    fontSize: "65%",
+    fontWeight: "400",
+    lineHeight: "1",
+  },
+  marginTop: "0",
+  marginBottom: "3px",
+  minHeight: "auto",
+  "& a": {
+    color: "#3C4858",
+    textDecoration: "none",
+    fontWeight: "300",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    "& small": {
+      color: "#777",
+      fontSize: "65%",
+      fontWeight: "400",
+      lineHeight: "1",
+    },
+    marginTop: ".625rem",
+    marginBottom: "0.75rem",
+    minHeight: "auto",
+  },
+  cardIconTitle: {
+    color: "#3C4858",
+    textDecoration: "none",
+    fontWeight: "300",
+    fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+    "& small": {
+      color: "#777",
+      fontSize: "65%",
+      fontWeight: "400",
+      lineHeight: "1",
+    },
+    minHeight: "auto",
+    "& a": {
+      color: "#3C4858",
+      textDecoration: "none",
+      fontWeight: "300",
+      fontFamily: "'Roboto', 'Helvetica', 'Arial', sans-serif",
+      "& small": {
+        color: "#777",
+        fontSize: "65%",
+        fontWeight: "400",
+        lineHeight: "1",
+      },
+      marginTop: ".625rem",
+      marginBottom: "0.75rem",
+      minHeight: "auto",
+    },
+    marginTop: "15px",
+    marginBottom: "0px",
+  },
+  label: {
+    cursor: "pointer",
+    paddingLeft: "0",
+    color: "rgba(0, 0, 0, 0.26)",
+    fontSize: "14px",
+    lineHeight: "1.428571429",
+    fontWeight: "400",
+    display: "inline-flex",
+  },
+  selectFormControl: {
+    minWidth: "146px",
+    margin: "0px 17px 0px 0px !important",
+    "& > div": {
+      "&:before": {
+        borderBottomWidth: "1px !important",
+        borderBottomColor: "#D2D2D2 !important",
+      },
+      "&:after": {
+        borderBottomColor:
+          theme?.palette?.default?.main || "#3f51b5" + "!important",
+      },
+    },
+  },
+  selectMenu: {
+    "& > div > ul": {
+      border: "0",
+      padding: "5px 0",
+      margin: "0",
+      boxShadow: "none",
+      minWidth: "100%",
+      borderRadius: "4px",
+      boxSizing: "border-box",
+      display: "block",
+      fontSize: "14px",
+      textAlign: "left",
+      listStyle: "none",
+      backgroundColor: "#fff",
+      backgroundClip: "padding-box",
+    },
+    "& > div + div": {
+      maxHeight: "266px !important",
+    },
+  },
+  checked: {
+    color: theme?.palette?.default?.main || "#3f51b5" + "!important",
+  },
+  checkedIcon: {
+    width: "20px",
+    height: "20px",
+    border: "1px solid rgba(0, 0, 0, .54)",
+    borderRadius: "3px",
+  },
+  uncheckedIcon: {
+    width: "0px",
+    height: "0px",
+    padding: "9px",
+    border: "1px solid rgba(0, 0, 0, .54)",
+    borderRadius: "3px",
+  },
+});
+
+export default FormsStyle;
