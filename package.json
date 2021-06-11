@@ -1,5 +1,5 @@
 {
-  "name": "@intervanAR/autogestion-components",
+  "name": "@intervanAR/componentes-ov",
   "version": "0.2.83",
   "files": [
     "./dist",
@@ -14,6 +14,7 @@
   "module": "dist/index.esm.js",
   "source": "src/index.js",
   "dependencies": {
+    "react-block-ui": "^1.3.3",
     "react-scripts": "3.0.1"
   },
   "peerDependencies": {
